@@ -114,10 +114,18 @@
                     <a href="#" class="dropdown-item dropdown-footer">See All Notifications</a>
                 </div>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" data-widget="control-sidebar" data-slide="true" href="#" role="button">
-                    <i class="fas fa-th-large"></i>
+
+            <li class="nav-item dropdown">
+                <a class="nav-link" data-toggle="dropdown" href="#">
+                    <i class="fas fa-cog"></i>
                 </a>
+                <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+                    <span class="dropdown-item dropdown-header">mas opciones</span>
+                    <div class="dropdown-divider"></div>
+                        <a class="dropdown-item cerrar-sesion">
+                            <i class="fas fa-sign-out-alt"> Cerrar Sesión</i>
+                        </a>
+                </div>
             </li>
         </ul>
     </nav>

@@ -1,0 +1,12 @@
+# nos dice si un directorio es un enlace simbólico, que lo siga.
+Options +FollowSymLinks
+
+#  le decimos a Apache que queremos sobre escribir las URLs para crear URLs amigables.
+RewriteEngine on
+
+#configuración para redirección con url amigables
+RewriteRule ^perfil$ perfil.php
+RewriteRule ^dashboard$ dashboard.php
+RewriteRule ^login$ index.php
+RewriteRule ^inicio$ index.php
+RewriteRule ^404$ 404.php

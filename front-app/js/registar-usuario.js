@@ -9,7 +9,8 @@
                 event.preventDefault();
                 event.stopPropagation();
                 if (form.checkValidity()) {
-                    let url = "https://localhost/uber-web-app/back-app/";
+                    let url = "http://localhost/uber-web-app/back-app/";
+                    
                     let data = new FormData(forms[0]);
                     data.append("opcion","registrarUsuario");
                     fetchAPI(url,"POST",data)
