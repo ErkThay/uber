@@ -26,4 +26,4 @@
     <?php endif;?>
     <link rel="stylesheet" href="css/clone-uber.css">
 </head>
-<body class="hold-transition <?= $bodyClass;?>">
+<body class="hold-transition layout-navbar-fixed <?= $bodyClass;?>">

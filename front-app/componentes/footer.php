@@ -9,6 +9,7 @@
     <!-- fetch api -->
     <script src="js/fetch-api.js"></script>
 
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDbd9fMR2yve5AiJAdw_4Oj16t7bdeMok0&callback=initMap"></script>
     <?php if( isset( $scripts ) ) : ?>
         <?php foreach( $scripts as $script ) : ?>
             <script src="<?=  $script; ?>"></script>

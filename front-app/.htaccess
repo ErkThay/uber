@@ -9,4 +9,6 @@ RewriteRule ^perfil$ perfil.php
 RewriteRule ^dashboard$ dashboard.php
 RewriteRule ^login$ index.php
 RewriteRule ^inicio$ index.php
+RewriteRule ^usuarios$ usuarios.php
+RewriteRule ^mi-viaje$ mi-viaje.php
 RewriteRule ^404$ 404.php
