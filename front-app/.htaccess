@@ -4,11 +4,15 @@ Options +FollowSymLinks
 #  le decimos a Apache que queremos sobre escribir las URLs para crear URLs amigables.
 RewriteEngine on
 
+#configuración para redirección http a https
+RewriteCond %{HTTPS} off
+RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI} [R,L]
+
 #configuración para redirección con url amigables
 RewriteRule ^perfil$ perfil.php
 RewriteRule ^dashboard$ dashboard.php
 RewriteRule ^login$ index.php
 RewriteRule ^inicio$ index.php
-RewriteRule ^usuarios$ usuarios.php
-RewriteRule ^mi-viaje$ mi-viaje.php
 RewriteRule ^404$ 404.php
+RewriteRule ^mi-viaje$ mi-viaje.php
+RewriteRule ^usuarios$ usuarios.php

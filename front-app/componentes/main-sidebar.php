@@ -2,8 +2,7 @@
    <aside class="main-sidebar sidebar-dark-primary elevation-4">
         <!-- Brand Logo -->
         <a href="dashboard" class="brand-link">
-            <img src="img/taxi.png" alt="uber Logo" class="brand-image img-circle elevation-3"
-                style="opacity: .8">
+            <img src="img/taxi.png" alt="uber Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
             <span class="brand-text font-weight-light">Clone Uber</span>
         </a>
 
@@ -43,13 +42,13 @@
                             <li class="nav-item">
                                 <a href="usuarios" class="nav-link">
                                     <i class="far fa-circle nav-icon"></i>
-                                    <p>usuarios</p>
+                                    <p>Usuarios</p>
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a href="perfil" class="nav-link">
                                     <i class="far fa-circle nav-icon"></i>
-                                    <p>Mi Perfil</p>
+                                    <p>Mi perfil</p>
                                 </a>
                             </li>
                             <li class="nav-item">

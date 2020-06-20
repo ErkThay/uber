@@ -36,6 +36,29 @@
 
         }
 
+        public function cargarCoordenadas($idTypeUser){
+            $respuesta = null;
+
+            try{
+                $sql = "SELECT users.name, travel.lat, travel.lng
+                        FROM users
+                        INNER JOIN travel
+                        ON users.id_user = travel.id_user
+                        WHERE users.id_type_user = :id_type_user";
+                $database = new database();
+                $db = $database->getConnection();
+                $stmt = $db->prepare($sql);
+                $stmt->bindParam(":id_type_user",$idTypeUser);
+                $stmt->execute();
+                $respuesta["estatus"] = "ok";
+                $respuesta["mensaje"] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            }catch(PDOException $e){
+                $respuesta["estatus"] = "error";
+                $respuesta["mensaje"] = $e->getMessage();
+            }
+            return $respuesta;
+        }
+
         public function cargarUsuarios(){
             $respuesta = null;
 

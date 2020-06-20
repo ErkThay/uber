@@ -20,6 +20,11 @@
         case "loginUsuario":
             $respuesta = $consultas->loginUsuario( $_POST["email"] , $_POST["password"] );
         break;
+
+        case "cargarCoordenadas":
+            $respuesta = $consultas->cargarCoordenadas($_POST["id_type_user"]);
+        break;
+
     }
 
     echo json_encode($respuesta);
