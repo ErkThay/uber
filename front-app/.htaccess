@@ -8,6 +8,7 @@ RewriteEngine on
 RewriteCond %{HTTPS} off
 RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI} [R,L]
 
+
 #configuración para redirección con url amigables
 RewriteRule ^perfil$ perfil.php
 RewriteRule ^dashboard$ dashboard.php
