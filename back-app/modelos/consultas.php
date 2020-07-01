@@ -40,7 +40,7 @@
             $respuesta = null;
 
             try{
-                $sql = "SELECT users.name, travel.lat, travel.lng
+                $sql = "SELECT users.name, users.id_user, users.genero, users.ruta_perfil, users.valoracion , travel.lat, travel.lng
                         FROM users
                         INNER JOIN travel
                         ON users.id_user = travel.id_user

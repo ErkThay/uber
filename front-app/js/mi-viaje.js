@@ -621,7 +621,7 @@
         } else {
             console.error("el navegador no soporta geolocation");
         }
-
+        var miMarcador = undefined;
         function initMap(coordenadas) {
 
             let geocoder = new google.maps.Geocoder;
@@ -631,7 +631,8 @@
                     if (results[0]) {
                         let direccion = results[0].formatted_address;
                         let inputOrigen = document.getElementById("inputOrigen");
-                        let miMarcador = crearMarker(coordenadas, "img/street-view.png", direccion);
+                        if(miMarcador != undefined) miMarcador.setMap(null);
+                        miMarcador = crearMarker(coordenadas, "img/street-view.png", direccion);
                         inputOrigen.value = direccion;
                         miMarcador.setMap(map);
                     } else {
@@ -648,17 +649,8 @@
             if (horas >= 0 && horas < 12) cargarMapa(estilo1);
             if (horas >= 12 && horas < 18) cargarMapa(estilo2);
             if (horas >= 18 && horas < 24) cargarMapa(estilo3);
-
-            let contador = 0;
-            // setInterval(() => {
-            //     console.log(contador++);
-            //     cargarUbers();
-            // }, 1000);
-
-            cargarUbers();
-
+            cargarUbers();    
         }
-
         function cargarUbers() {
             let url = "https://localhost/uber-web-app/back-app/";
             let data = new FormData();
@@ -667,7 +659,24 @@
             fetchAPI(url, "POST", data)
                 .then((data) => {
                     if (data.estatus == "ok") {
+
                         let conductores = data.mensaje;
+                        let indice = 0;
+                        var marcadores = [];
+                        let markerDestino  = undefined;
+                        setInterval(() => {
+                            indice++;
+                            indice = indice % conductores.length;
+                            $(".imagen-perfil").attr("src", conductores[indice].ruta_perfil);
+                            $(".widget-user-username").text(conductores[indice].name);
+                            $(".widget-user-desc").text(`condutor${(conductores[indice].genero == 2) ? "a" : ""}`);
+                            document.getElementById("valoracion").innerHTML = "";
+                            let valoracion = conductores[indice].valoracion;
+                            if (valoracion > 0) {
+                                for (let index = 0; index < valoracion; index++)  document.getElementById("valoracion").innerHTML += `<i class="fas fa-star mt-4"></i>`;
+                            }
+
+                        }, 2000);
 
                         const latLng = (point) => new google.maps.LatLng(point);
 
@@ -698,9 +707,109 @@
                             if (cercaDelUsuario.cercano) return conductor;
                         });
                         ubersCercanos.forEach((uberCercano) => {
-                            let destino = crearObjeto(cadenaFlotante(uberCercano.lat), cadenaFlotante(uberCercano.lng));
-                            let marcadorConductor = crearMarker(destino, "img/car.png", uberCercano.name);
+                            let marcadorConductor = crearMarker(new google.maps.LatLng(cadenaFlotante(uberCercano.lat), cadenaFlotante(uberCercano.lng)), "img/car.png", uberCercano.name);
                             marcadorConductor.setMap(map);
+                            marcadores.push(marcadorConductor);
+
+                        });
+
+                        const limipiarMacadores = () => marcadores.forEach((marcador) => marcador.setMap(null));
+                        var mp = undefined; 
+                        var car = "M17.402,0H5.643C2.526,0,0,3.467,0,6.584v34.804c0,3.116,2.526,5.644,5.643,5.644h11.759c3.116,0,5.644-2.527,5.644-5.644 V6.584C23.044,3.467,20.518,0,17.402,0z M22.057,14.188v11.665l-2.729,0.351v-4.806L22.057,14.188z M20.625,10.773 c-1.016,3.9-2.219,8.51-2.219,8.51H4.638l-2.222-8.51C2.417,10.773,11.3,7.755,20.625,10.773z M3.748,21.713v4.492l-2.73-0.349 V14.502L3.748,21.713z M1.018,37.938V27.579l2.73,0.343v8.196L1.018,37.938z M2.575,40.882l2.218-3.336h13.771l2.219,3.336H2.575z M19.328,35.805v-7.872l2.729-0.355v10.048L19.328,35.805z";
+                        var icon = {
+                            path: car,
+                            scale: .7,
+                            strokeColor: 'white',
+                            strokeWeight: .10,
+                            fillOpacity: 1,
+                            fillColor: '#404040',
+                            offset: '5%',
+                            anchor: new google.maps.Point(10, 25)
+                        };
+
+                        const moverMaker =  ( points ) => {
+                            var target = 0;
+                            var kmH = 50;
+                            var retraso = 100;
+                            const goToPoint = () => {
+                                var lat = mp.position.lat();
+                                var lng = mp.position.lng();
+                                var step = (kmH * 1000 * retraso) / 3600000; // in meters
+                                var dest = new google.maps.LatLng(points[target].lat(), points[target].lng());
+                                var distance = google.maps.geometry.spherical.computeDistanceBetween(dest, mp.position);
+                                var rotationAngle = google.maps.geometry.spherical.computeHeading(mp.position, dest);
+                                var numStep = distance / step;
+                                var i = 0;
+                                var deltaLat = (points[target].lat() - lat) / numStep;
+                                var deltaLng = (points[target].lng() - lng) / numStep;
+                                const moveMarker = ()  =>{
+                                    lat += deltaLat;
+                                    lng += deltaLng;
+                                    i += step;
+                                    if (i < distance) {
+                                        mp.setPosition(new google.maps.LatLng(lat, lng));
+    
+                                        setTimeout(moveMarker, retraso);
+                                    }
+                                    else {
+                                        mp.setPosition(dest);
+                                        target++;
+                                        if (target == points.length) return;
+                                        setTimeout(goToPoint, retraso);
+                                    }
+                                    icon.rotation = rotationAngle;
+                                    mp.setIcon(icon);
+                                }
+                                moveMarker();
+                            }
+                            goToPoint();
+                        };
+
+                        function calculateAndDisplayRoute(directionsService, directionsRenderer) {
+                            let  request = {
+                                origin: { query: $('#inputOrigen').val() },
+                                destination: { query: $('#inputDestino').val() },
+                                travelMode: "DRIVING"
+                            };
+
+                            directionsService.route(request, (response, status) => {
+                                if (status === 'OK') {
+                                    limipiarMacadores();
+                                    directionsRenderer.setDirections(response);
+                                    //tarifa por kilometro en pesos 
+                                    let tarifaKilometro = 2;
+                                    let myRoute = response.routes[0].legs[0];
+                                    let points = response.routes[0].overview_path;
+                                
+                                    mp = new google.maps.Marker({ position : new google.maps.LatLng( points[0].lat(),points[0].lng() ) });
+                                    mp.setMap(map);
+                                    moverMaker(points);
+                                    $(".tiempo").text(myRoute.duration.text);
+                                    $(".distancia").text(myRoute.distance.text);
+                                    $(".tarifa-pagar").text((tarifaKilometro * (myRoute.distance.value / 1000) * 21.93).toFixed(2));
+                                    //  let markerOrigen = crearMarker(myRoute.start_location, "img/street-view.png", `inicie en : ${myRoute.start_address}`);
+                                    if(markerDestino != undefined) markerDestino.setMap(null);
+                                    if(miMarcador != undefined) miMarcador.setMap(null);
+                                    markerDestino = crearMarker(myRoute.end_location, "img/checkpoint.png", `mi destino es : ${myRoute.end_address}`);
+                                    //  markerOrigen.setMap(map);
+                                    markerDestino.setMap(map);
+                                } else {
+                                    window.alert('Directions request failed due to ' + status);
+                                }
+                            });
+
+                        }
+
+
+                        Array.prototype.filter.call(forms, (form) => {
+                            form.addEventListener('submit', (event) => {
+                                event.preventDefault();
+                                event.stopPropagation();
+                                if (form.checkValidity()) {
+                                    calculateAndDisplayRoute(directionsService, directionsRenderer);
+                                }
+                                form.classList.add('was-validated');
+                            }, false);
                         });
                     }
                 });
@@ -731,46 +840,6 @@
         }
 
 
-        function calculateAndDisplayRoute(directionsService, directionsRenderer) {
-            directionsService.route(
-                {
-                    origin: { query: $('#inputOrigen').val() },
-                    destination: { query: $('#inputDestino').val() },
-                    travelMode: google.maps.DirectionsTravelMode.DRIVING
-                },
-                function (response, status) {
-                    if (status === 'OK') {
-                        directionsRenderer.setDirections(response);
-                        //tarifa por kilometro en pesos 
-                        let tarifaKilometro = 2;
-                        let myRoute = response.routes[0].legs[0];
-                        let points = response.routes[0].overview_path;
-                        console.log(points);
-                        let mp = new google.maps.Marker({
-                            position: { lat: points[0].lat(), lng: points[0].lng() }
-                        });
-                        mp.setMap(map);
-
-                        mp.setPosition({ lat: points[1].lat(), lng: points[1].lng() });
-                        // points.forEach((point)=>{
-                        //     let marker = new google.maps.Marker({
-                        //         position : {lat : point.lat(), lng : point.lng()}
-                        //     });
-                        //     marker.setMap(map);
-                        // });
-                        $(".tiempo").text(myRoute.duration.text);
-                        $(".distancia").text(myRoute.distance.text);
-                        $(".tarifa-pagar").text((tarifaKilometro * (myRoute.distance.value / 1000) * 21.93).toFixed(2));
-                        //  let markerOrigen = crearMarker(myRoute.start_location, "img/street-view.png", `inicie en : ${myRoute.start_address}`);
-                        let markerDestino = crearMarker(myRoute.end_location, "img/checkpoint.png", `mi destino es : ${myRoute.end_address}`);
-                        //  markerOrigen.setMap(map);
-                        markerDestino.setMap(map);
-                        cargarUbers();
-                    } else {
-                        window.alert('Directions request failed due to ' + status);
-                    }
-                });
-        }
 
 
         function crearMarker(coords, url, title) {
@@ -787,28 +856,32 @@
             switch (opcion) {
                 case 1:
                     nuevoEstilo = estilo1;
-                    $(".contenedor-cards > div").removeClass().addClass("card card-success");
+                    $(".contenedor-cards > div:last-child").removeClass().addClass("card card-success");
+                    $(".card-widget > div:first-child").removeClass().addClass("widget-user-header p-2 bg-success");
                     $(".formulario-viaje > button").removeClass().addClass("btn btn-success float-right");
                     $(".input-group-prepend > span").removeClass().addClass("input-group-text bg-success text-white");
                     $(".dropdown > button").removeClass().addClass("btn btn-success dropdown-toggle");
                     break;
                 case 2:
                     nuevoEstilo = estilo2;
-                    $(".contenedor-cards > div").removeClass().addClass("card card-2");
+                    $(".contenedor-cards > div:last-child").removeClass().addClass("card card-2");
+                    $(".card-widget > div:first-child").removeClass().addClass("widget-user-header p-2  estilo-2 text-white ");
                     $(".formulario-viaje > button").removeClass().addClass("btn btn-light text-white estilo-2 float-right");
                     $(".input-group-prepend > span").removeClass().addClass("input-group-text estilo-2 text-white");
                     $(".dropdown > button").removeClass().addClass("btn btn-light estilo-2 text-white dropdown-toggle");
                     break;
                 case 3:
                     nuevoEstilo = estilo3;
-                    $(".contenedor-cards > div").removeClass().addClass("card card-3");
+                    $(".contenedor-cards > div:last-child").removeClass().addClass("card card-3");
+                    $(".card-widget > div:first-child").removeClass().addClass("widget-user-header p-2  estilo-3  text-white");
                     $(".formulario-viaje > button").removeClass().addClass("btn btn-dark estilo-3 float-right");
                     $(" .input-group-prepend > span").removeClass().addClass("input-group-text  estilo-3  text-white");
                     $(".dropdown > button").removeClass().addClass("btn btn-dark  estilo-3 dropdown-toggle");
                     break;
                 case 4:
                     nuevoEstilo = estilo4;
-                    $(".contenedor-cards > div").removeClass().addClass("card card-4");
+                    $(".contenedor-cards > div:last-child").removeClass().addClass("card card-4");
+                    $(".card-widget > div:first-child").removeClass().addClass("widget-user-header p-2  estilo-4 text-white");
                     $(".formulario-viaje > button").removeClass().addClass("btn btn-secondary estilo-4 float-right");
                     $(".input-group-prepend > span").removeClass().addClass("input-group-text  estilo-4 text-white");
                     $(".dropdown > button").removeClass().addClass("btn btn-secondary estilo-4 dropdown-toggle");
@@ -822,16 +895,6 @@
             map.set("styles", establecerTema(opcion));
         });
 
-        Array.prototype.filter.call(forms, (form) => {
-            form.addEventListener('submit', (event) => {
-                event.preventDefault();
-                event.stopPropagation();
-                if (form.checkValidity()) {
-                    cargarMapa(estilo2);
-                    calculateAndDisplayRoute(directionsService, directionsRenderer);
-                }
-                form.classList.add('was-validated');
-            }, false);
-        });
+
     }, false);
 })();
