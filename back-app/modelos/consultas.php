@@ -95,5 +95,25 @@
             }
             return $respuesta;
         }
+
+        public function usuario($idUsuario){
+            $respuesta = null;
+            try{
+                $sql = "SELECT users.name, users.ruta_perfil, users.genero, users.valoracion, users.habilidades 
+                        FROM users  
+                        WHERE id_user = :id_user";
+                $database = new database();
+                $db = $database->getConnection();
+                $stmt = $db->prepare($sql);
+                $stmt->bindParam(":id_user",$idUsuario);
+                $stmt->execute();
+                $respuesta["estatus"] = "ok";
+                $respuesta["mensaje"] =  $stmt->fetch(PDO::FETCH_ASSOC);
+            }catch(PDOException $e){
+                $respuesta["estatus"] = "error";
+                $respuesta["mensaje"] = $e->getMessage();
+            }
+            return $respuesta;
+        }
     }
 ?>

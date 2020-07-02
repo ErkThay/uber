@@ -32,7 +32,7 @@
                             <!-- Widget: user widget style 2 -->
                             <div class="card card-widget widget-user-2">
                                 <!-- Add the bg color to the header using any of the bg-* classes -->
-                                <div class="widget-user-header p-2 bg-success">
+                                <a class="widget-user-header p-2 bg-success" href="#">
                                     <div class="row">
                                         <div class="col-8">
                                             <div class="widget-user-image">
@@ -45,7 +45,7 @@
                                         </div>
                                         <div class="col-4 text-right" id="valoracion"> </div>
                                     </div>
-                                </div>
+                                </a>
                                 <div class="card-footer p-0">
                                     <div class="row">
                                         <div class="col-4 border-right">

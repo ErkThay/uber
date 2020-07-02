@@ -667,14 +667,14 @@
                         setInterval(() => {
                             indice++;
                             indice = indice % conductores.length;
-                            $(".imagen-perfil").attr("src", conductores[indice].ruta_perfil);
-                            $(".widget-user-username").text(conductores[indice].name);
-                            $(".widget-user-desc").text(`condutor${(conductores[indice].genero == 2) ? "a" : ""}`);
+                            let conductorCercano = conductores[indice];
+                            $(".imagen-perfil").attr("src", conductorCercano.ruta_perfil);
+                            $(".widget-user-username").text(conductorCercano.name);
+                            $(".widget-user-desc").text(`condutor${(conductorCercano.genero == 2) ? "a" : ""}`);
+                            $("a.widget-user-header").attr("href",`perfil/${  conductorCercano.id_user }`);
                             document.getElementById("valoracion").innerHTML = "";
-                            let valoracion = conductores[indice].valoracion;
-                            if (valoracion > 0) {
-                                for (let index = 0; index < valoracion; index++)  document.getElementById("valoracion").innerHTML += `<i class="fas fa-star mt-4"></i>`;
-                            }
+                            let valoracion = conductorCercano.valoracion;
+                            if (valoracion > 0) for (let index = 0; index < valoracion; index++)  document.getElementById("valoracion").innerHTML += `<i class="fas fa-star mt-4"></i>`;
 
                         }, 2000);
 

@@ -10,7 +10,7 @@ RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI} [R,L]
 
 
 #configuración para redirección con url amigables
-RewriteRule ^perfil$ perfil.php
+RewriteRule ^perfil/([A-Za-z0-9-]+)$ perfil.php?idUsuario=$1
 RewriteRule ^dashboard$ dashboard.php
 RewriteRule ^login$ index.php
 RewriteRule ^inicio$ index.php
